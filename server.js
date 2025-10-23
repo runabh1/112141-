@@ -94,7 +94,14 @@ const gmailRoutes = require('./routes/gmail');
 app.use('/api/gmail', gmailRoutes);
 
 // Start server
-const PORT = config.server.port;
-app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
-});
+const PORT = process.env.PORT || config.server.port;
+
+// Only start server if not in Vercel environment
+if (process.env.NODE_ENV !== 'production' || process.env.VERCEL !== '1') {
+  app.listen(PORT, () => {
+    console.log(`Server running on http://localhost:${PORT}`);
+  });
+}
+
+// Export for Vercel
+module.exports = app;

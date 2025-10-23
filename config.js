@@ -4,7 +4,7 @@ module.exports = {
   google: {
     clientId: process.env.GOOGLE_CLIENT_ID || 'your-google-client-id-here',
     clientSecret: process.env.GOOGLE_CLIENT_SECRET || 'your-google-client-secret-here',
-    redirectUri: process.env.GOOGLE_REDIRECT_URI || 'http://localhost:9002/api/auth/google/callback'
+    redirectUri: process.env.GOOGLE_REDIRECT_URI || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}/api/auth/google/callback` : 'http://localhost:9002/api/auth/google/callback')
   },
   
   // Gemini API Key
