@@ -26,17 +26,39 @@ An intelligent Gmail email summarization tool powered by Google's Gemini AI. Thi
 npm install
 ```
 
-### 2. Configure Google OAuth
+### 2. Configure Environment Variables
 
-The application is already configured with the provided credentials:
-- Client ID: `311927548209-qc6ibnhs4hclgblfdb6ets3hrpn6bn3f.apps.googleusercontent.com`
-- Client Secret: `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`
-- Redirect URI: `http://localhost:9002/api/auth/google/callback`
+Create a `.env` file in the root directory:
 
-### 3. Configure Gemini API
+```env
+# Google OAuth Credentials
+GOOGLE_CLIENT_ID=your-google-client-id-here
+GOOGLE_CLIENT_SECRET=your-google-client-secret-here
+GOOGLE_REDIRECT_URI=http://localhost:9002/api/auth/google/callback
 
-The Gemini API key is already configured:
-- API Key: `AIzaSyBqDzU_o_6nVqX-GTurKjnegqrb_VwoJDs`
+# Gemini API Key
+GEMINI_API_KEY=your-gemini-api-key-here
+
+# Session Secret
+SESSION_SECRET=your-super-secret-session-key-here
+
+# Server Port
+PORT=9002
+```
+
+### 3. Get Your API Credentials
+
+**Google OAuth Setup:**
+1. Go to [Google Cloud Console](https://console.cloud.google.com/)
+2. Create a new project or select existing one
+3. Enable Gmail API and Google+ API
+4. Go to Credentials → Create OAuth 2.0 Client ID
+5. Add authorized redirect URI: `http://localhost:9002/api/auth/google/callback`
+
+**Gemini API Setup:**
+1. Go to [Google AI Studio](https://aistudio.google.com/)
+2. Create a new API key
+3. Copy the API key to your `.env` file
 
 ### 4. Start the Application
 

@@ -2,14 +2,14 @@
 module.exports = {
   // Google OAuth Credentials
   google: {
-    clientId: process.env.GOOGLE_CLIENT_ID || '311927548209-qc6ibnhs4hclgblfdb6ets3hrpn6bn3f.apps.googleusercontent.com',
-    clientSecret: process.env.GOOGLE_CLIENT_SECRET || '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',
+    clientId: process.env.GOOGLE_CLIENT_ID || 'your-google-client-id-here',
+    clientSecret: process.env.GOOGLE_CLIENT_SECRET || 'your-google-client-secret-here',
     redirectUri: process.env.GOOGLE_REDIRECT_URI || 'http://localhost:9002/api/auth/google/callback'
   },
   
   // Gemini API Key
   gemini: {
-    apiKey: process.env.GEMINI_API_KEY || 'AIzaSyBqDzU_o_6nVqX-GTurKjnegqrb_VwoJDs'
+    apiKey: process.env.GEMINI_API_KEY || 'your-gemini-api-key-here'
   },
   
   // Session configuration
