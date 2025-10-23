@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Gmail Summarizer</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .auth-section {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .login-btn {
+            background: linear-gradient(45deg, #4285f4, #34a853);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            box-shadow: 0 4px 15px rgba(66, 133, 244, 0.3);
+        }
+
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(66, 133, 244, 0.4);
+        }
+
+        .dashboard {
+            display: none;
+        }
+
+        .dashboard.active {
+            display: block;
+        }
+
+        .controls {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .controls h3 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #555;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: #4285f4;
+        }
+
+        .btn {
+            background: linear-gradient(45deg, #4285f4, #34a853);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px rgba(66, 133, 244, 0.3);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(45deg, #6c757d, #495057);
+        }
+
+        .btn-danger {
+            background: linear-gradient(45deg, #dc3545, #c82333);
+        }
+
+        .emails-container {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        .email-item {
+            border: 1px solid #e1e5e9;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .email-item:hover {
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transform: translateY(-2px);
+        }
+
+        .email-item.selected {
+            border-color: #4285f4;
+            background: #f8f9ff;
+        }
+
+        .email-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 10px;
+        }
+
+        .email-subject {
+            font-weight: 600;
+            color: #333;
+            font-size: 1.1rem;
+        }
+
+        .email-from {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .email-date {
+            color: #999;
+            font-size: 0.8rem;
+        }
+
+        .email-snippet {
+            color: #666;
+            margin-top: 10px;
+            line-height: 1.4;
+        }
+
+        .checkbox {
+            margin-right: 10px;
+        }
+
+        .summary-container {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            margin-top: 20px;
+        }
+
+        .summary-item {
+            border-left: 4px solid #4285f4;
+            padding: 20px;
+            margin-bottom: 20px;
+            background: #f8f9ff;
+            border-radius: 0 10px 10px 0;
+        }
+
+        .summary-subject {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .summary-content {
+            color: #555;
+            line-height: 1.6;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+
+        .loading i {
+            font-size: 2rem;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border: 1px solid #f5c6cb;
+        }
+
+        .success {
+            background: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border: 1px solid #c3e6cb;
+        }
+
+        .user-info {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .user-details {
+            display: flex;
+            align-items: center;
+        }
+
+        .user-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #4285f4, #34a853);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            margin-right: 15px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .email-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .user-info {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-envelope-open-text"></i> AI Gmail Summarizer</h1>
+            <p>Intelligent email summarization powered by Gemini AI</p>
+        </div>
+
+        <div id="authSection" class="auth-section">
+            <h2>Welcome to AI Gmail Summarizer</h2>
+            <p>Sign in with your Google account to start summarizing your emails</p>
+            <a href="/api/auth/google" class="login-btn">
+                <i class="fab fa-google"></i> Sign in with Google
+            </a>
+        </div>
+
+        <div id="dashboard" class="dashboard">
+            <div class="user-info">
+                <div class="user-details">
+                    <div class="user-avatar" id="userAvatar">U</div>
+                    <div>
+                        <div id="userName">User</div>
+                        <div id="userEmail" style="color: #666; font-size: 0.9rem;">user@example.com</div>
+                    </div>
+                </div>
+                <a href="/api/auth/logout" class="btn btn-danger">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </a>
+            </div>
+
+            <div class="controls">
+                <h3><i class="fas fa-cog"></i> Email Controls</h3>
+                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; margin-bottom: 20px;">
+                    <div class="form-group">
+                        <label for="maxResults">Number of Emails</label>
+                        <select id="maxResults">
+                            <option value="10">10 emails</option>
+                            <option value="20">20 emails</option>
+                            <option value="50">50 emails</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="query">Search Query</label>
+                        <input type="text" id="query" placeholder="e.g., from:important@company.com">
+                    </div>
+                    <div class="form-group">
+                        <label>&nbsp;</label>
+                        <button class="btn" onclick="loadEmails()">
+                            <i class="fas fa-sync"></i> Load Emails
+                        </button>
+                    </div>
+                </div>
+                <div>
+                    <button class="btn" onclick="selectAllEmails()">
+                        <i class="fas fa-check-square"></i> Select All
+                    </button>
+                    <button class="btn btn-secondary" onclick="clearSelection()">
+                        <i class="fas fa-square"></i> Clear Selection
+                    </button>
+                    <button class="btn" onclick="summarizeSelected()" id="summarizeBtn" disabled>
+                        <i class="fas fa-brain"></i> Summarize Selected
+                    </button>
+                </div>
+            </div>
+
+            <div class="emails-container">
+                <h3><i class="fas fa-inbox"></i> Your Emails</h3>
+                <div id="emailsList">
+                    <div class="loading">
+                        <i class="fas fa-spinner"></i>
+                        <p>Loading emails...</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="summaryContainer" class="summary-container" style="display: none;">
+                <h3><i class="fas fa-lightbulb"></i> AI Summaries</h3>
+                <div id="summariesList"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let emails = [];
+        let selectedEmails = new Set();
+
+        // Check authentication status on page load
+        async function checkAuth() {
+            try {
+                const response = await fetch('/api/user');
+                const data = await response.json();
+                
+                if (data.authenticated) {
+                    showDashboard(data.user);
+                } else {
+                    showAuthSection();
+                }
+            } catch (error) {
+                console.error('Auth check failed:', error);
+                showAuthSection();
+            }
+        }
+
+        function showAuthSection() {
+            document.getElementById('authSection').style.display = 'block';
+            document.getElementById('dashboard').classList.remove('active');
+        }
+
+        function showDashboard(user) {
+            document.getElementById('authSection').style.display = 'none';
+            document.getElementById('dashboard').classList.add('active');
+            
+            // Update user info
+            document.getElementById('userName').textContent = user.displayName || 'User';
+            document.getElementById('userEmail').textContent = user.emails?.[0]?.value || 'user@example.com';
+            document.getElementById('userAvatar').textContent = (user.displayName || 'U').charAt(0).toUpperCase();
+            
+            // Load emails automatically
+            loadEmails();
+        }
+
+        async function loadEmails() {
+            const maxResults = document.getElementById('maxResults').value;
+            const query = document.getElementById('query').value;
+            
+            try {
+                const response = await fetch(`/api/gmail/emails?maxResults=${maxResults}&query=${encodeURIComponent(query)}`);
+                const data = await response.json();
+                
+                if (data.emails) {
+                    emails = data.emails;
+                    displayEmails();
+                } else {
+                    showError('Failed to load emails');
+                }
+            } catch (error) {
+                console.error('Error loading emails:', error);
+                showError('Failed to load emails');
+            }
+        }
+
+        function displayEmails() {
+            const emailsList = document.getElementById('emailsList');
+            
+            if (emails.length === 0) {
+                emailsList.innerHTML = '<p style="text-align: center; color: #666; padding: 40px;">No emails found</p>';
+                return;
+            }
+
+            emailsList.innerHTML = emails.map((email, index) => `
+                <div class="email-item" onclick="toggleEmailSelection(${index})">
+                    <div class="email-header">
+                        <div>
+                            <div class="email-subject">${email.subject}</div>
+                            <div class="email-from">From: ${email.from}</div>
+                        </div>
+                        <div class="email-date">${new Date(email.date).toLocaleDateString()}</div>
+                    </div>
+                    <div class="email-snippet">${email.snippet}</div>
+                    <input type="checkbox" class="checkbox" ${selectedEmails.has(index) ? 'checked' : ''} 
+                           onchange="toggleEmailSelection(${index})" onclick="event.stopPropagation()">
+                </div>
+            `).join('');
+        }
+
+        function toggleEmailSelection(index) {
+            if (selectedEmails.has(index)) {
+                selectedEmails.delete(index);
+            } else {
+                selectedEmails.add(index);
+            }
+            
+            updateSummarizeButton();
+            updateEmailItemStyles();
+        }
+
+        function selectAllEmails() {
+            selectedEmails.clear();
+            for (let i = 0; i < emails.length; i++) {
+                selectedEmails.add(i);
+            }
+            updateSummarizeButton();
+            updateEmailItemStyles();
+            displayEmails();
+        }
+
+        function clearSelection() {
+            selectedEmails.clear();
+            updateSummarizeButton();
+            updateEmailItemStyles();
+            displayEmails();
+        }
+
+        function updateSummarizeButton() {
+            const btn = document.getElementById('summarizeBtn');
+            btn.disabled = selectedEmails.size === 0;
+            btn.textContent = selectedEmails.size > 0 ? 
+                `Summarize Selected (${selectedEmails.size})` : 
+                'Summarize Selected';
+        }
+
+        function updateEmailItemStyles() {
+            const emailItems = document.querySelectorAll('.email-item');
+            emailItems.forEach((item, index) => {
+                if (selectedEmails.has(index)) {
+                    item.classList.add('selected');
+                } else {
+                    item.classList.remove('selected');
+                }
+            });
+        }
+
+        async function summarizeSelected() {
+            if (selectedEmails.size === 0) return;
+
+            const selectedEmailIds = Array.from(selectedEmails).map(index => emails[index].id);
+            
+            try {
+                showLoading('Summarizing emails...');
+                
+                const response = await fetch('/api/gmail/summarize-batch', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ emailIds: selectedEmailIds })
+                });
+                
+                const data = await response.json();
+                
+                if (data.summaries) {
+                    displaySummaries(data.summaries);
+                } else {
+                    showError('Failed to summarize emails');
+                }
+            } catch (error) {
+                console.error('Error summarizing emails:', error);
+                showError('Failed to summarize emails');
+            }
+        }
+
+        function displaySummaries(summaries) {
+            const summaryContainer = document.getElementById('summaryContainer');
+            const summariesList = document.getElementById('summariesList');
+            
+            summariesList.innerHTML = summaries.map(summary => `
+                <div class="summary-item">
+                    <div class="summary-subject">${summary.subject}</div>
+                    <div class="summary-content">${summary.summary}</div>
+                </div>
+            `).join('');
+            
+            summaryContainer.style.display = 'block';
+            summaryContainer.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function showLoading(message) {
+            const emailsList = document.getElementById('emailsList');
+            emailsList.innerHTML = `
+                <div class="loading">
+                    <i class="fas fa-spinner"></i>
+                    <p>${message}</p>
+                </div>
+            `;
+        }
+
+        function showError(message) {
+            const emailsList = document.getElementById('emailsList');
+            emailsList.innerHTML = `
+                <div class="error">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    ${message}
+                </div>
+            `;
+        }
+
+        // Initialize the app
+        checkAuth();
+    </script>
+</body>
+</html>
